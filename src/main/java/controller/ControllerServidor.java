@@ -24,6 +24,7 @@ import java.util.Scanner;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.codec.binary.Hex;
 import utils.GCM;
+import utils.PBKDF2UtilBCFIPS;
 import utils.SCRYPT;
 import utils.Util;
 
@@ -34,9 +35,12 @@ import utils.Util;
 public class ControllerServidor {
 
     private static ControllerServidor instancia;
-    private final GCM gcm;
     private final UsuarioDAO usuarioDAO;
     ArrayList<String> respostas;
+    private String token;
+    private String tokenScrypt;
+    private String code;
+    private String key;
 
     public static ControllerServidor getInstancia() {
         if (instancia == null) {
@@ -46,7 +50,6 @@ public class ControllerServidor {
     }
 
     public ControllerServidor() {
-        this.gcm = GCM.getInstance();
         this.usuarioDAO = UsuarioDAO.getInstancia();
         this.respostas = new ArrayList<>();
         respostas.add("Sim!");
@@ -59,32 +62,39 @@ public class ControllerServidor {
         this.usuarioDAO.put(new Usuario(login, tokenScrypt, salt));
     }
 
-    public String loginServidor(String login, String token) throws NoSuchAlgorithmException, NoSuchProviderException, WriterException, IOException {
+    public boolean loginServidor(String login, String token) throws NoSuchAlgorithmException, NoSuchProviderException, WriterException, IOException {
         Usuario usuario = this.usuarioDAO.get(login);
         if (usuario == null) {
             System.out.println("Usuário não cadastrado!");
-            return null;
+            return false;
         }
-        String tokenScrypt = SCRYPT.generateDerivedKey(token, usuario.getSalt());
+        this.tokenScrypt = SCRYPT.generateDerivedKey(token, usuario.getSalt());
         if (!usuario.getSenha().toString().equals(tokenScrypt.toString())) {
             System.out.println("Senha incorreta");
-            return null;
+            return false;
         }
-        String TOTPcode = getTOTPCode(tokenScrypt);
-        //String barCodeUrl = getGoogleAuthenticatorBarCode(tokenScrypt, "email@gmail.com", login);
-        //createQRCode(barCodeUrl, "matrixURL.png", 246, 246);
+        this.token = token;
+        return true;
+
+    }
+
+    public void twoFA() throws WriterException, IOException {
+        String TOTPcode = getTOTPCode(this.tokenScrypt);
         System.out.println("Procure o arquivo matrixCode.png no diretorio do projeto e leia o QR code para digitar o código");
         createQRCode(TOTPcode, "matrixCode.png", 246, 246);
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Entre o código de autenticação: ");
         System.out.println(TOTPcode);
-        String code = scanner.nextLine();
-        if (code.toString().equals(TOTPcode.toString())) {
+        System.out.println("Entre o código de autenticação: ");
+    }
+
+    public boolean validate2FA(String code) {
+        String newTOTPcode = getTOTPCode(tokenScrypt);
+        if (code.toString().equals(newTOTPcode.toString())) {
             System.out.println("Logged in successfully");
-            return code;
+            this.code = code;
+            return true;
         } else {
             System.out.println("Invalid 2FA Code");
-            return null;
+            return false;
         }
     }
 
@@ -119,10 +129,13 @@ public class ControllerServidor {
         }
     }
 
-    public String messagemServidor(String token, String code, String msg) {
-        String defifrada = gcm.decifrarGCM(token, code, msg);
+    public String lerResponderMessagem(String msg) {
+        if (this.key == null) {
+            this.key = PBKDF2UtilBCFIPS.generateDerivedKey(this.token, this.code);
+        }
+        String defifrada = GCM.decifrarGCM(this.key, this.code, msg);
         System.out.println("Msg decifrada pelo servidor = " + defifrada);
-        String cifrada = gcm.cifrarGCM(token, code, this.respostas.get((int) Math.round(Math.random())));
+        String cifrada = GCM.cifrarGCM(this.key, this.code, this.respostas.get((int) Math.round(Math.random())));
         System.out.println("Msg cifrada pelo servidor = " + cifrada);
         return cifrada;
     }

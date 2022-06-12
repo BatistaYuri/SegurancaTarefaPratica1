@@ -11,18 +11,20 @@ import utils.GCM;
 import utils.PBKDF2UtilBCFIPS;
 import utils.Util;
 
-
 /**
  *
  * @author Yuri
  */
 public class ControllerUsuario {
+
     private static ControllerUsuario instancia;
     private final Scanner scanner;
-    private final GCM gcm;
-    
-    public static ControllerUsuario getInstancia(){
-        if(instancia == null){
+    private String token;
+    private String code;
+    private String key;
+
+    public static ControllerUsuario getInstancia() {
+        if (instancia == null) {
             instancia = new ControllerUsuario();
         }
         return instancia;
@@ -30,29 +32,39 @@ public class ControllerUsuario {
 
     public ControllerUsuario() {
         this.scanner = new Scanner(System.in);
-        this.gcm = GCM.getInstance();
     }
-    
+
     public String getPBKDF2(String login, String senha) throws NoSuchAlgorithmException, NoSuchProviderException {
         String saltHashLogin = Util.getHash256(senha);
-        return PBKDF2UtilBCFIPS.generateDerivedKey(senha, saltHashLogin);
+        this.token = PBKDF2UtilBCFIPS.generateDerivedKey(senha, saltHashLogin);
+        return this.token;
     }
     
-    public String messagemUsuario(String token,String code) {
-        System.out.println("Digite sua pergunta de Sim ou Não:");
+    public String twoFA(){
+        Scanner scanner = new Scanner(System.in);
+        String code = scanner.nextLine();
+        this.code = code;
+        return code;
+    }
+
+    public String enviarMessagem() {
+        System.out.println("Digite sua pergunta de resposta Sim ou Não:");
         String msg = scanner.nextLine();
-        if(msg.toString().equals("exit")){
+        if (msg.toString().equals("exit")) {
             return null;
         }
-        String cifrada = this.gcm.cifrarGCM(token,code,msg);
+        if (this.key == null) {
+            this.key = PBKDF2UtilBCFIPS.generateDerivedKey(this.token, this.code);
+        }
+        String cifrada = GCM.cifrarGCM(this.key, this.code, msg);
         System.out.println("Msg cifrada pelo cliente = " + cifrada);
         return cifrada;
     }
-    
-    public void lerMsg(String token,String code, String msg){
-        String defifrada = gcm.decifrarGCM(token, code, msg);
+
+    public void lerMessagem(String msg) {
+        String defifrada = GCM.decifrarGCM(this.key, this.code, msg);
         System.out.println("Msg decifrada pelo cliente = " + defifrada);
-       
+
     }
-    
+
 }

@@ -26,17 +26,7 @@ import org.apache.commons.codec.binary.Hex;
  */
 public class GCM {
 
-    private static GCM instance;
-    private static Util util;
-
-    public static GCM getInstance() {
-        if (instance == null) {
-            instance = new GCM();
-        }
-        return instance;
-    }
-
-    public String cifrarGCM(String token, String code, String msg) {
+    public static String cifrarGCM(String token, String code, String msg) {
         try {
             System.out.println("Msg = " + msg);
 
@@ -63,7 +53,7 @@ public class GCM {
 
     ;
     
-    public String decifrarGCM(String token, String code, String msg) {
+    public static String decifrarGCM(String token, String code, String msg) {
         try {
             //  chave (K)
             byte[] K = org.apache.commons.codec.binary.Hex.decodeHex(token.toCharArray());

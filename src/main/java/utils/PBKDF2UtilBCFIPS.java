@@ -13,15 +13,6 @@ import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
  * @author Yuri
  */
 public class PBKDF2UtilBCFIPS {
-
-    private static PBKDF2UtilBCFIPS instance;
-
-    public static PBKDF2UtilBCFIPS getInstance() {
-        if (instance == null) {
-            instance = new PBKDF2UtilBCFIPS();
-        }
-        return instance;
-    }
         
     public static String generateDerivedKey(String password, String salt) {
         int addProvider;
