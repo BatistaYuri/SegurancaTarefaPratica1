@@ -47,7 +47,7 @@ public class ControllerUsuario {
         return code;
     }
 
-    public String enviarMessagem() {
+    public String enviarMensagem() {
         System.out.println("Digite sua pergunta de resposta Sim ou Não:");
         String msg = scanner.nextLine();
         if (msg.toString().equals("exit")) {
@@ -61,7 +61,7 @@ public class ControllerUsuario {
         return cifrada;
     }
 
-    public void lerMessagem(String msg) {
+    public void lerMensagem(String msg) {
         String defifrada = GCM.decifrarGCM(this.key, this.code, msg);
         System.out.println("Msg decifrada pelo cliente = " + defifrada);
 

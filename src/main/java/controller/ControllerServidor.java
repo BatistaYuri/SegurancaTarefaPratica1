@@ -129,7 +129,7 @@ public class ControllerServidor {
         }
     }
 
-    public String lerResponderMessagem(String msg) {
+    public String lerResponderMensagem(String msg) {
         if (this.key == null) {
             this.key = PBKDF2UtilBCFIPS.generateDerivedKey(this.token, this.code);
         }

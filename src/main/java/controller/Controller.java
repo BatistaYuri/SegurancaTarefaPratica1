@@ -71,19 +71,7 @@ public class Controller {
 
         this.loginFirstFactor(login, token);
         this.loginSecondFactor();
-
-        String msg = "";
-        String msgServidor = null;
-        while (msg != null) {
-            if (msgServidor != null) {
-                this.controllerUsuario.lerMessagem(msgServidor);
-            }
-            msg = this.controllerUsuario.enviarMessagem();
-            if (msg != null) {
-                msgServidor = this.controllerServidor.lerResponderMessagem(msg);
-            }
-        }
-        this.init();
+        this.mensagem();
     }
 
     public void cadastrar() throws NoSuchAlgorithmException, NoSuchProviderException, WriterException, IOException {
@@ -120,6 +108,21 @@ public class Controller {
         Collection<Usuario> usuarios = controllerServidor.getUsuarios();
         System.out.println("Usuários:");
         usuarios.forEach(usuario -> System.out.println(usuario.getLogin()));
+        this.init();
+    }
+    
+    public void mensagem () throws NoSuchAlgorithmException, NoSuchProviderException, WriterException, IOException {
+        String msg = "";
+        String msgServidor = null;
+        while (msg != null) {
+            if (msgServidor != null) {
+                this.controllerUsuario.lerMensagem(msgServidor);
+            }
+            msg = this.controllerUsuario.enviarMensagem();
+            if (msg != null) {
+                msgServidor = this.controllerServidor.lerResponderMensagem(msg);
+            }
+        }
         this.init();
     }
 
