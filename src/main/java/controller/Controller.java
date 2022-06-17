@@ -60,6 +60,18 @@ public class Controller {
                 break;
         }
     }
+    
+    public void cadastrar() throws NoSuchAlgorithmException, NoSuchProviderException, WriterException, IOException {
+        System.out.println("Novo login:");
+        String login = scanner.nextLine();
+        System.out.println("Nova senha:");
+        String senha = scanner.nextLine();
+
+        String token = this.controllerUsuario.getPBKDF2(login, senha);
+        this.controllerServidor.cadastraServidor(login, token);
+        System.out.println("Novo usuário cadastrado!");
+        this.init();
+    }
 
     public void login() throws NoSuchAlgorithmException, NoSuchProviderException, WriterException, IOException {
         System.out.println("Login:");
@@ -72,18 +84,6 @@ public class Controller {
         this.loginFirstFactor(login, token);
         this.loginSecondFactor();
         this.mensagem();
-    }
-
-    public void cadastrar() throws NoSuchAlgorithmException, NoSuchProviderException, WriterException, IOException {
-        System.out.println("Novo login:");
-        String login = scanner.nextLine();
-        System.out.println("Nova senha:");
-        String senha = scanner.nextLine();
-
-        String token = this.controllerUsuario.getPBKDF2(login, senha);
-        this.controllerServidor.cadastraServidor(login, token);
-        System.out.println("Novo usuário cadastrado!");
-        this.init();
     }
 
     public void loginFirstFactor(String login, String token) throws NoSuchAlgorithmException, NoSuchProviderException, WriterException, IOException {

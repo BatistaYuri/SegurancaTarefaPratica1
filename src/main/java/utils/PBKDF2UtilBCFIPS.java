@@ -17,7 +17,7 @@ public class PBKDF2UtilBCFIPS {
     public static String generateDerivedKey(String password, String salt) {
         int addProvider;
         addProvider = Security.addProvider(new BouncyCastleFipsProvider());
-        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 5000, 128);
+        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 5000, 128); // senha / salt / interacoes / tamanho
         SecretKeyFactory pbkdf2 = null;
         String derivedPass = null;
         try {
