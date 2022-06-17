@@ -91,6 +91,7 @@ public class ControllerServidor {
         if (code.toString().equals(newTOTPcode.toString())) {
             System.out.println("Logged in successfully");
             this.code = code;
+            this.key = null;
             return true;
         } else {
             System.out.println("Invalid 2FA Code");

@@ -44,6 +44,7 @@ public class ControllerUsuario {
         Scanner scanner = new Scanner(System.in);
         String code = scanner.nextLine();
         this.code = code;
+        this.key = null;
         return code;
     }
 
