@@ -26,12 +26,12 @@ import org.apache.commons.codec.binary.Hex;
  */
 public class GCM {
 
-    public static String cifrarGCM(String token, String code, String msg) {
+    public static String cifrarGCM(String keySession, String code, String msg) {
         try {
             System.out.println("Msg = " + msg);
 
             //  chave (K)
-            byte[] K = org.apache.commons.codec.binary.Hex.decodeHex(token.toCharArray());
+            byte[] K = org.apache.commons.codec.binary.Hex.decodeHex(keySession.toCharArray());
             //  texto plano (P)
             byte[] P = msg.getBytes();
             //  nonce (IV)
@@ -53,10 +53,10 @@ public class GCM {
 
     ;
     
-    public static String decifrarGCM(String token, String code, String msg) {
+    public static String decifrarGCM(String keySession, String code, String msg) {
         try {
             //  chave (K)
-            byte[] K = org.apache.commons.codec.binary.Hex.decodeHex(token.toCharArray());
+            byte[] K = org.apache.commons.codec.binary.Hex.decodeHex(keySession.toCharArray());
             //  texto plano (P)
             byte[] P = msg.getBytes();
             //  nonce (IV)

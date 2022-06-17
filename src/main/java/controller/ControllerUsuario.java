@@ -35,7 +35,7 @@ public class ControllerUsuario {
     }
 
     public String getPBKDF2(String login, String senha) throws NoSuchAlgorithmException, NoSuchProviderException {
-        String saltHashLogin = Util.getHash256(senha);
+        String saltHashLogin = Util.getHash256(login);
         this.token = PBKDF2UtilBCFIPS.generateDerivedKey(senha, saltHashLogin);
         return this.token;
     }
